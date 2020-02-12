@@ -1,0 +1,3 @@
+# Dockerfile
+FROM binux/pyspider:latest
+RUN pip install MySQL-python

@@ -1,0 +1,63 @@
+version: "3.7"
+services:
+  phantomjs:
+    container_name: phantomjs
+    build:
+      context: .
+      dockerfile: DockerFile
+    command: phantomjs
+    ports:
+      - "25555:25555"
+  result:
+    container_name: result
+    build:
+      context: .
+      dockerfile: DockerFile
+    external_links:
+      - mysql
+      - rabbitmq
+    command: result_worker
+  processor:
+    container_name: processor
+    build:
+      context: .
+      dockerfile: DockerFile
+    external_links:
+      - mysql
+      - rabbitmq
+    command: processor
+  fetcher:
+    container_name: fetcher
+    build:
+      context: .
+      dockerfile: DockerFile
+    external_links:
+      - rabbitmq
+    links:
+      - phantomjs
+    command : fetcher
+  scheduler:
+    container_name: scheduler
+    build:
+      context: .
+      dockerfile: DockerFile
+    external_links:
+      - mysql
+      - rabbitmq
+    command: scheduler
+    ports:
+      - "23333:23333"
+  webui:
+    container_name: webui
+    build:
+      context: .
+      dockerfile: DockerFile
+    external_links:
+      - mysql
+      - rabbitmq
+    links:
+      - scheduler
+      - phantomjs
+    command: webui --port 5555
+    ports:
+      - "5555:5555"
